@@ -494,27 +494,58 @@ export default class Delimiter {
    * @returns {[{*}]}
    */
   renderSettings() {
-    const starStyle = this._createSetting(
-      asteriskIcon, 'Star', () => this._setStar(), this.currentDelimiterStyle === 'star', 'star'
-    );
-    const dashStyle = this._createSetting(
-      delimiterIcon, 'Dash', () => this._setDash(), this.currentDelimiterStyle === 'dash', 'dash'
-    );
-    const lineWidths = this.availableLineWidths.map(width => 
-      this._createSetting(
-        getLineWidthIcon(width), this._getFormattedLabel(width, 'Line ', '%'), () => this._setLine(width), 
-        this.currentDelimiterStyle === 'line' && width === this.currentLineWidth, 'line'
-      )
-    );
-    let lineThickness = [];
-    if (this.currentDelimiterStyle === 'line') {
-      lineThickness = this.availableLineThickness.map(thickness => 
-        this._createSetting(
-          getThicknessIcon(thickness), this._getFormattedLabel(thickness, 'Thickness '), 
-          () => this._setLineThickness(thickness), thickness === this.currentLineThickness, 'thickness')
-      );
-    }
+        const settings = [];
+        if (this.availableDelimiterStyles.includes('star')) {
+            settings.push(
+                this._createSetting(
+                    asteriskIcon,
+                    'Star',
+                    () => this._setStar(),
+                    this.currentDelimiterStyle === 'star',
+                    'star',
+                ),
+            );
+        }
+        if (this.availableDelimiterStyles.includes('dash')) {
+            settings.push(
+                this._createSetting(
+                    delimiterIcon,
+                    'Dash',
+                    () => this._setDash(),
+                    this.currentDelimiterStyle === 'dash',
+                    'dash',
+                ),
+            );
+        }
+        if (this.availableDelimiterStyles.includes('line')) {
+            if(this.availableLineWidths.length > 1) {
+                const lineWidths = this.availableLineWidths.map((width) =>
+                    this._createSetting(
+                        getLineWidthIcon(width),
+                        this._getFormattedLabel(width, 'Line ', '%'),
+                        () => this._setLine(width),
+                        this.currentDelimiterStyle === 'line' &&
+                        width === this.currentLineWidth,
+                        'line',
+                    ),
+                );
+                settings.push(...lineWidths);
+            }
 
-    return [starStyle, dashStyle, ...lineWidths, ...lineThickness];
-  }
+            if (this.currentDelimiterStyle === 'line' && this.availableLineThickness.length > 1) {
+                const lineThickness = this.availableLineThickness.map(
+                    (thickness) =>
+                        this._createSetting(
+                            getThicknessIcon(thickness),
+                            this._getFormattedLabel(thickness, 'Thickness '),
+                            () => this._setLineThickness(thickness),
+                            thickness === this.currentLineThickness,
+                            'thickness',
+                        ),
+                );
+                settings.push(...lineThickness);
+            }
+        }
+        return settings;
+    }
 }
